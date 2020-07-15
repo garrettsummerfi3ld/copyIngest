@@ -28,35 +28,48 @@ def err(args): print(Fore.RED + args)
 # Cyan
 def debug(args): print(Fore.CYAN + args)
 
-### FUNCTION
+### FUNCTIONS
 
 # Checks location of sourcePath if it is a real location
 def sourcePathCheck():
-    debug("Checking source path...")
+    debug("Started sourcePathCheck()")
+    info("Checking source path...")
     if (path.exists(sourcePath) == False):
+        debug("Path exists bool =" + str(path.exists(sourcePath)))
         warn("Source location does not exist!")
         info("Creating source location...")
         os.mkdir(sourcePath)
         success("Created source location!")
         pass
     else:
+        debug("Path exists bool =" + str(path.exists(sourcePath)))
         info("Source location exists!")
         pass
 
 # Checks location of destPath if it is a real location
 def destPathCheck():
-    debug("Checking destination path...")
+    info("Checking destination path...")
     if (path.exists(destPath) == False):
         warn("Destination location does not exist!")
         info("Creating destination location")
-        
+        os.mkdir(destPath)
+        success("Created destination location")
+        pass
+    else:
+        info("Destination location exists!")
+
+# File checking
+def checkFiles():
+    debug
 
 # Main function
 def main():
+    debug("Started main()")
     try:
         sourcePathCheck()
+        destPathCheck()
     except Exception as ex:
-        err("Something really fucky just happened. Printing stacktrace...")
+        err("Something really bad just happened. Printing stacktrace...")
         err(ex)
         SystemExit(1)
 
