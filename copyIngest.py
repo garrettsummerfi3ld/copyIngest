@@ -12,7 +12,7 @@ with open("vars.json", "r") as vars:
     data = json.load(vars)
 sourcePath = data["sourcePath"]
 destPath = data["destPath"]
-fileTypes = data["fileTypes"]
+allowFileTypes = data["allowFileTypes"]
 currentDateTime = datetime.datetime.now()
 sourceFiles = []
 
@@ -76,28 +76,45 @@ def destPathCheck():
 # Checks for files in the sourcePath
 def checkFiles():
     info("Checking files in sourcePath...")
+    totalAllowedFiles = 0
+    totalDenyFiles = 0
     for r, d, f in os.walk(data["sourcePath"]):
         for file in f:
-            if data["fileTypes"] in file:
+            ext = path.splitext(file)[1].lower()
+            if (file in allowFileTypes):
                 sourceFiles.append(path.join(r, file))
+                totalAllowedFiles = totalAllowedFiles + 1
+                debug("totalAllowedFiles Discovered: {}".format(str(totalAllowedFiles)))
+            else:
+                warn("Files are found in the source directory, however the files are not a part of the allow list.")
+                totalDenyFiles = totalDenyFiles + 1
+                debug("totalDenyFiles Discovered: {}".format(str(totalDenyFiles)))
 
     for f in sourceFiles:
-        info("Found {}".format(f))
-
+        debug("Found {}".format(f))
+    
     if len(sourceFiles) == 0:
-        err("There are no files! Exiting as there is nothing to do...")
-        SystemExit(1)
+        err("There are no files!")
+        raise FileNotFoundError
+
+# Copy function
+def copyFiles():
+    info("Copying files...\nSRC: {}\nDEST: {}".format(sourcePath, destPath))
+    shutil.copytree(sourcePath, destPath)
 
 # Main function
 def main():
     info("Started at {}".format(str(currentDateTime)))
 
     try:
-        debug("Checking 'vars.json'...")
-        debug(str(data))
+        debug("Checking 'vars.json'...\n" + str(data))
         sourcePathCheck()
         destPathCheck()
         checkFiles()
+    
+    except FileNotFoundError as fileErr:
+        crit("Failed to find the given path or failed to find files. Check if there are files in that path or the path is properly set up in the 'vars.json' file.")
+        SystemExit(2)
 
     except Exception as ex:
         crit("Something really bad just happened. Printing stacktrace...")
