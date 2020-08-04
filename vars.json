@@ -1,7 +1,7 @@
 {
-    "sourcePath" : "G:\\Ingest",
-    "destPath" : "E:\\Videos\\Ingest",
-    "allowFileTypes" : [
+    "sourcePath": "G:\\Ingest",
+    "destPath": "E:\\Videos\\Ingest",
+    "allowFileTypes": [
         ".mp4",
         ".mov",
         ".mkv",

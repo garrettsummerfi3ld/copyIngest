@@ -80,19 +80,19 @@ def checkFiles():
     totalDenyFiles = 0
     for r, d, f in os.walk(data["sourcePath"]):
         for file in f:
+            debug("Found {}".format(file))
             ext = path.splitext(file)[1].lower()
-            if (file in allowFileTypes):
+            if (ext in allowFileTypes):
                 sourceFiles.append(path.join(r, file))
                 totalAllowedFiles = totalAllowedFiles + 1
                 debug("totalAllowedFiles Discovered: {}".format(str(totalAllowedFiles)))
+                debug("totalDenyFiles Discovered: {}".format(str(totalDenyFiles)))
             else:
                 warn("Files are found in the source directory, however the files are not a part of the allow list.")
                 totalDenyFiles = totalDenyFiles + 1
+                debug("totalAllowedFiles Discovered: {}".format(str(totalAllowedFiles)))
                 debug("totalDenyFiles Discovered: {}".format(str(totalDenyFiles)))
 
-    for f in sourceFiles:
-        debug("Found {}".format(f))
-    
     if len(sourceFiles) == 0:
         err("There are no files!")
         raise FileNotFoundError
@@ -111,7 +111,7 @@ def main():
         sourcePathCheck()
         destPathCheck()
         checkFiles()
-    
+        debug("Checking 'sourceFiles'...\n" + str(sourceFiles))
     except FileNotFoundError as fileErr:
         crit("Failed to find the given path or failed to find files. Check if there are files in that path or the path is properly set up in the 'vars.json' file.")
         SystemExit(2)
