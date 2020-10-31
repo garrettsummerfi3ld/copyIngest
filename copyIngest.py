@@ -7,7 +7,7 @@ import os.path as path
 from colorama import init, Fore, Back, Style
 from termcolor import colored
 
-### VARS
+# VARS
 with open("vars.json", "r") as vars:
     data = json.load(vars)
 sourcePath = data["sourcePath"]
@@ -17,7 +17,7 @@ currentDateTime = datetime.datetime.now()
 sourceFiles = []
 
 
-### COLOR LOGGING
+# COLOR LOGGING
 init(autoreset=True)
 
 # Success -> green
@@ -38,7 +38,7 @@ def crit(args): print(Back.RED + Fore.WHITE + args)
 # Debug -> Cyan
 def debug(args): print(Fore.CYAN + args)
 
-### FUNCTIONS
+# FUNCTIONS
 
 # Checks location of sourcePath if it is a real location
 def sourcePathCheck():
@@ -54,8 +54,8 @@ def sourcePathCheck():
             info("Source location exists!")
             pass
     else:
-        raise FileNotFoundError("'sourcePath' in 'vars.json' is left blank. Edit the file to fix this issue")
-
+        raise FileNotFoundError(
+            "'sourcePath' in 'vars.json' is left blank. Edit the file to fix this issue")
 
 # Checks location of destPath if it is a real location
 def destPathCheck():
@@ -71,7 +71,8 @@ def destPathCheck():
             info("Destination location exists!")
             pass
     else:
-        raise FileNotFoundError("'destPath' in 'vars.json' is left blank. Edit the file to fix this issue")
+        raise FileNotFoundError(
+            "'destPath' in 'vars.json' is left blank. Edit the file to fix this issue")
 
 # Checks for files in the sourcePath
 def checkFiles():
@@ -85,22 +86,30 @@ def checkFiles():
             if (ext in allowFileTypes):
                 sourceFiles.append(path.join(r, file))
                 totalAllowedFiles = totalAllowedFiles + 1
-                debug("totalAllowedFiles Discovered: {}".format(str(totalAllowedFiles)))
+                debug("totalAllowedFiles Discovered: {}".format(
+                    str(totalAllowedFiles)))
                 debug("totalDenyFiles Discovered: {}".format(str(totalDenyFiles)))
             else:
-                warn("Files are found in the source directory, however the files are not a part of the allow list.")
                 totalDenyFiles = totalDenyFiles + 1
-                debug("totalAllowedFiles Discovered: {}".format(str(totalAllowedFiles)))
+                debug("totalAllowedFiles Discovered: {}".format(
+                    str(totalAllowedFiles)))
                 debug("totalDenyFiles Discovered: {}".format(str(totalDenyFiles)))
 
     if len(sourceFiles) == 0:
         err("There are no files!")
         raise FileNotFoundError
 
+    if (totalDenyFiles > 0):
+        warn("Files are found in the source directory, however the files are not a part of the allow list.")
+
+
 # Copy function
 def copyFiles():
     info("Copying files...\nSRC: {}\nDEST: {}".format(sourcePath, destPath))
-    shutil.copytree(sourcePath, destPath)
+    try:
+        shutil.copytree(sourcePath, destPath)
+    except FileExistsError as fileExist:
+        err("There is a file that exists already in the destination directory!")
 
 # Main function
 def main():
@@ -112,6 +121,7 @@ def main():
         destPathCheck()
         checkFiles()
         debug("Checking 'sourceFiles'...\n" + str(sourceFiles))
+        copyFiles()
     except FileNotFoundError as fileErr:
         crit("Failed to find the given path or failed to find files. Check if there are files in that path or the path is properly set up in the 'vars.json' file.")
         SystemExit(2)
